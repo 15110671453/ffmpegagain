@@ -61,6 +61,12 @@ fi
 test -d /usr/xpg4/bin && PATH=/usr/xpg4/bin:$PATH
 
 
+#shell 中enable 用于载入自定义的一些命令 或者 shell内建命令
+echo "输出当前的脚本所执行系统的环境变量"
+for e in $(env) ;do
+   echo ${e}
+done
+
 
 #输出脚本参数个数 与所有脚本参数
 echo "number:$#" >./loglog 2>&1
@@ -74,6 +80,7 @@ done
 uname -s >>./loglog 2>&1
 uname -p >>./loglog 2>&1
 uname -m >>./loglog 2>&1
+echo "脚本工作路径检查"
 #$0 获取到脚本自己的名字
 echo $0
 #获取当前脚本文件所在的目录
@@ -81,6 +88,15 @@ echo $(dirname "$0")
 #注意生命变量 与 赋值运算符之间不得有空格  负责提示找不到命令
 source_path=$(cd $(dirname "$0"); pwd)
 echo ${source_path}
+
+echo "当前脚本进程的ID"
+echo $$
+
+echo "当前脚本进程传入的参数"
+echo $*
+echo "当前脚本进程传入的参数的个数"
+echo $#
+
 
 #命令替换 变量替换 完成括号里的命令行，然后将其结果替换出来，再重组命令行
 #$( ) 与 ` ` (反引号) 都是来将括号中的 当作命令执行 将执行结果返回当作新的命令
@@ -160,13 +176,84 @@ OUTDEV_LIST=$(find_things_test muxer AVOutputFormat libavdevice/alldevices.c out
 #libdc1394_indev
 
 
-#shell 中enable 用于载入自定义的一些命令 或者 shell内建命令
 
-enable env
 
-for e in $env; do
-   echo ${e}
+show_help(){
+
+cat <<EOF
+
+    帮助文档.$1
+
+EOF
+   #终止整个命令继续向下运行
+   #exit 0 
+
+}
+
+#执行函数 自定义命令
+echo "-----函数开始执行-----"
+show_help argument1
+echo "-----函数执行完毕-----"
+
+val="dynbash"
+
+if [[ "$val" = "dynbash" ]]; then
+    #statements
+    echo "      字符串相等"
+fi
+
+num=100
+
+if [[ "$num" = "100" ]]; then
+    #statements
+    echo "      字符串数值相等"
+fi
+
+#一对括号表示是数组，数组元素用“空格”符号分割开。
+#引用数组时从序号0开始
+array_file=(test1 test2 test3 content1 content2)
+
+echo "-----遍历数组开始-----"
+
+var="10 20 30 40 50"
+
+array=($var)
+
+for fileN in ${array[@]};do
+
+    echo ${fileN}
+
 done
+
+for fileN in ${array_file[@]};do
+
+    echo ${fileN}
+
+done
+
+echo "-----遍历数组结束-----"
+
+echo "-----遍历目录中文件-----"
+
+#将ls的结果保存到变量中
+#${} 是在获取变量值前 可以变量名正则表达式替换后再获取
+#$() 是执行当前命令串
+# "" 主要是拼接字符串 可以在其中使用$符号 获取到变量值 完成格式表达式替换
+
+
+comd='ls'
+
+CUR_DIR=$($comd)
+
+for val1 in $CUR_DIR ; do
+    #statements
+if [[ -f $val1 ]]; then
+    #statements
+    echo "FILE: $val1"
+fi
+done
+
+
 
 
 
